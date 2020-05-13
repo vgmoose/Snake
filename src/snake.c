@@ -1,5 +1,6 @@
+#include <coreinit/internal.h>
 #include "snake.h"
-#include "system/memory.h"
+
 #define M 2147483647 
 #define A 16807
 #define Q ( M / A )
@@ -259,7 +260,7 @@ void moveSnake(Snake* s, char direction) {
 					current = current->next; 
 				}
 
-				// If the last part is too smal to be reduced
+				// If the last part is too small to be reduced
 				if(current->length == 1) {
 					// Then we have to delete it
 					MEMBucket_free(current);
@@ -324,17 +325,17 @@ int isOnSnake(Snake* s, int head, int x, int y) {
     return 0;
 }
 
-void triggerSnake(Snake* s, VPADData* vpad) {
+void triggerSnake(Snake* s, VPADStatus* vpad) {
 
 	if(!s->pause)
 	{
-		if (vpad->btns_h & VPAD_BUTTON_UP) moveSnake(s, 'U');
-		if (vpad->btns_h & VPAD_BUTTON_DOWN) moveSnake(s, 'D');
-		if (vpad->btns_h & VPAD_BUTTON_LEFT) moveSnake(s, 'L');
-		if (vpad->btns_h & VPAD_BUTTON_RIGHT) moveSnake(s, 'R');
+		if (vpad->hold & VPAD_BUTTON_UP) moveSnake(s, 'U');
+		if (vpad->hold & VPAD_BUTTON_DOWN) moveSnake(s, 'D');
+		if (vpad->hold & VPAD_BUTTON_LEFT) moveSnake(s, 'L');
+		if (vpad->hold & VPAD_BUTTON_RIGHT) moveSnake(s, 'R');
 
-		float x = vpad->lstick.x;
-		float y = vpad->lstick.y;
+		float x = vpad->leftStick.x;
+		float y = vpad->leftStick.y;
 		float abs_x = x;
 		float abs_y = y;
 

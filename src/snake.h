@@ -1,8 +1,8 @@
 #ifndef SNAKE_H
 #define SNAKE_H
-#include "dynamic_libs/os_functions.h"
 #include "draw.h"
-#include "dynamic_libs/vpad_functions.h"
+#include "system/memory.h"
+#include <vpad/input.h>
 
 typedef struct SnakeI SnakeI;
 struct SnakeI {
@@ -50,7 +50,7 @@ void moveSnake(Snake* s, char direction);
 int isOnSnake(Snake* s, int head, int x, int y);
 int isLooseMoove(Snake* s);
 void setNewFoodCoord(Snake* s);
-void triggerSnake(Snake* s, VPADData* vpad);
+void triggerSnake(Snake* s, VPADStatus* vpad);
 void stretchSnake(Snake* s, int length);
 int randU(int range_max, Snake* s);
 

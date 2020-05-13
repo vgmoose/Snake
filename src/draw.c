@@ -1,5 +1,6 @@
 #include "draw.h"
-#include "dynamic_libs/os_functions.h"
+#include <coreinit/cache.h>
+#include <coreinit/memexpheap.h>
 
 void flipBuffers()
 {

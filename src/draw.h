@@ -1,5 +1,6 @@
 #ifndef DRAW_H
 #define DRAW_H
+#include <coreinit/screen.h>
 
 //Function declarations for my graphics library
 void flipBuffers();

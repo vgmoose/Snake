@@ -19,44 +19,30 @@
 |
 */
 
+#include <vpad/input.h>
+#include <coreinit/thread.h>
+#include <coreinit/time.h>
+#include <whb/log_console.h>
+#include <whb/log.h>
+#include <whb/proc.h>
+#include "system/memory.h"
 #include "main.h"
 #include "snake.h"
-#include "dynamic_libs/os_functions.h"
-#include "dynamic_libs/fs_functions.h"
-#include "dynamic_libs/gx2_functions.h"
-#include "dynamic_libs/sys_functions.h"
-#include "dynamic_libs/vpad_functions.h"
-#include "dynamic_libs/padscore_functions.h"
-#include "dynamic_libs/socket_functions.h"
-#include "dynamic_libs/ax_functions.h"
-#include "system/memory.h"
-#include "common/common.h"
 #include "draw.h"
 
 int Menu_Main()
-{
-	InitOSFunctionPointers();
-
-    InitFSFunctionPointers();
-    InitGX2FunctionPointers();
-    InitSysFunctionPointers();
-    InitVPadFunctionPointers();
-    InitPadScoreFunctionPointers();
-    InitAXFunctionPointers();
-    
+{    
     memoryInitialize();
-    
     VPADInit();
 
     int screen_buf0_size = 0;
-    int screen_buf1_size = 0;
 
 	//Call the Screen initilzation function.
 	OSScreenInit();
 	
 	//Grab the buffer size for each screen (TV and gamepad)
 	screen_buf0_size = OSScreenGetBufferSizeEx(0);
-	screen_buf1_size = OSScreenGetBufferSizeEx(1);
+	OSScreenGetBufferSizeEx(1);
     
 	//Set the buffer area.
 	OSScreenSetBufferEx(0, (void *)0xF4000000);
@@ -76,7 +62,7 @@ int Menu_Main()
 	/****************************>             VPAD LOOP             <****************************/
 	/* Enter the VPAD loop */
 	int error;
-	VPADData vpad_data;
+	VPADStatus vpad_data;
 
 	//Read initial vpad status
 	VPADRead(0, &vpad_data, 1, &error);
@@ -117,9 +103,9 @@ int Menu_Main()
 			displayStart(&s);
 		}
 
-		if(!s.start && (vpad_data.btns_h || vpad_data.btns_d)) s.start=1;
+		if(!s.start && (vpad_data.hold || vpad_data.trigger)) s.start=1;
 
-		if (vpad_data.btns_d & VPAD_BUTTON_A) {
+		if (vpad_data.trigger & VPAD_BUTTON_A) {
 			if(s.loose) {
 				s.length=6;
 				s.score=0;
@@ -127,12 +113,12 @@ int Menu_Main()
 				initSnake(&s);
 			}
 		}	
-		if ((vpad_data.btns_d & VPAD_BUTTON_B) && s.start) {
+		if ((vpad_data.trigger & VPAD_BUTTON_B) && s.start) {
 			if(s.pause) s.pause = 0;
 			else s.pause = 1;
 		}
 		/*
-		if (vpad_data.btns_d & VPAD_BUTTON_Y) {
+		if (vpad_data.trigger & VPAD_BUTTON_Y) {
 			if(s.debug) s.debug = 0;
 			else s.debug = 1;
 		}		
@@ -140,9 +126,9 @@ int Menu_Main()
 		// Clear buffer
 		flipBuffers();
 		// Exit when Home button is pressed
-		if(vpad_data.btns_h & VPAD_BUTTON_HOME) break;
+		if(vpad_data.hold & VPAD_BUTTON_HOME) break;
         
-        msleep(100);
+    OSSleepTicks(OSMillisecondsToTicks(100));
 	}
 
 	// WARNING: DO NOT CHANGE THIS. YOU MUST CLEAR THE FRAMEBUFFERS AND 
@@ -153,9 +139,9 @@ int Menu_Main()
 		fillScreen(0,0,0,0);
 		flipBuffers();
 	}
-    
-    memoryRelease();
-    
+
+  memoryRelease();
+        
 	return 0;
 }
 
